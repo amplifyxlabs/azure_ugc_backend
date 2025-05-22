@@ -45,23 +45,38 @@ npm start
 
 ### POST /api/ugc/process-video
 
-Process a video with hook text and optional audio replacement.
+Processes a video by adding hook text, optional background audio, and optionally concatenating a demo video. The resulting video is uploaded to Cloudinary.
 
-**Request:**
-- Content-Type: multipart/form-data
-- Body:
-  - `uploadedVideo` (file, optional): User-uploaded video
-  - `uploadedAudio` (file, optional): User-uploaded audio
-  - `hookText` (string): Text to overlay on video
-  - `hookPosition` (string): "top", "middle", or "bottom"
-  - `cloudinaryVideoUrl` (string, optional): URL to Cloudinary video if not uploading
-  - `cloudinaryAudioUrl` (string, optional): URL to Cloudinary audio if not uploading
+**Endpoint:** `/api/ugc/process-video`
+**Method:** `POST`
+**Content-Type:** `multipart/form-data`
+
+**Request Body Parameters:**
+
+*   `uploadedVideo` (file, optional): The video file to process. Use this if uploading a video directly. Either `uploadedVideo` or `cloudinaryVideoUrl` is required.
+*   `uploadedAudio` (file, optional): The audio file to use as background audio. Use this if uploading audio directly. Either `uploadedAudio` or `cloudinaryAudioUrl` can be provided, or neither if no background audio is desired.
+*   `hookText` (string, required): The text string to overlay on the video.
+*   `hookPosition` (string, required): The vertical position for the `hookText`. Accepted values are "top", "middle", or "bottom".
+*   `cloudinaryVideoUrl` (string, optional): A Cloudinary URL to the video to process. Use this if the video is already on Cloudinary. Either `uploadedVideo` or `cloudinaryVideoUrl` is required.
+*   `cloudinaryAudioUrl` (string, optional): A Cloudinary URL to the audio to use as background audio. Use this if the audio is already on Cloudinary. Either `uploadedAudio` or `cloudinaryAudioUrl` can be provided, or neither.
+*   `demoVideoUrl` (string, optional): A URL to a demo video that will be concatenated after the processed video.
 
 **Response:**
+
+Returns a JSON object upon successful processing and upload.
+
 ```json
 {
   "status": "success",
-  "videoUrl": "https://res.cloudinary.com/xxx/video/upload/v1234/ugc/abc123.mp4",
-  "message": "Video processed successfully"
+  "videoUrl": "https://res.cloudinary.com/your_cloud_name/video/upload/vTIMESTAMP/ugc/GENERATED_ID.mp4"
+}
+```
+
+In case of an error during processing, an error response is returned:
+
+```json
+{
+  "status": "error",
+  "message": "Detailed error message"
 }
 ``` 
